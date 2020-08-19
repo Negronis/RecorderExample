@@ -3,8 +3,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import Vconsole from 'vconsole';
-import RecordApp from './recorder';
-// import './wechat';
+import RecordApp from './recorder'; 
 const vconsole = new Vconsole();
 Vue.config.productionTip = false
 Vue.use(RecordApp);

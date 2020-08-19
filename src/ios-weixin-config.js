@@ -6,10 +6,6 @@ https://github.com/xiangyuecn/Recorder
 */
 (function () {
    "use strict";
-
-   /******简化后的使用配置修改项******/
-   //可简单修改此处配置即可正常使用。当然参考本例子全部自己写是最佳选择，可能需要多花点时间。
-
    /**【需修改】请使用自己的js文件目录，不要用github的不稳定。RecordApp会自动从这个目录内进行加载相关的实现文件、Recorder核心、编码引擎，会自动默认加载哪些文件，请查阅app.js内所有Platform的paths配置；如果这些文件你已手动全部加载，这个目录配置可以不用**/
    window.RecordAppBaseFolder = window.PageSet_RecordAppBaseFolder || "/src/";
    /**【需修改】请使用自己的微信JsSDK签名接口、素材下载接口，不能用这个，微信【强制】要【绑安全域名】，别的站用不了。下面ajax相关调用的请求参数、和响应结果格式也需要调整为自己的格式。
@@ -19,10 +15,12 @@ https://github.com/xiangyuecn/Recorder
    console.log('支持文件加载')
    var MyWxApi = window.PageSet_RecordAppWxApi || "https://fepic.natapp4.cc/api/getSign"; /*本例子提供的这个api接口：
             会实现两个功能，ajax POST请求参数如下(都是两个参数，完整细节看下面ajax调用):
-               功能一、action="sign" //JsSDK签名
-                     url="https://x.com/page" //当前页面url地址,需要对这个地址进行签名
-               功能二、action="wxdown" //素材下载
-                     mediaID="abcd" //需下载的素材ID
+               功能一、
+                  action="sign" //JsSDK签名
+                  url="https://x.com/page" //当前页面url地址,需要对这个地址进行签名
+               功能二、
+                  action="wxdown" //素材下载
+                  mediaID="abcd" //需下载的素材ID
             响应内容(JSON Object):
                {
                   c:0		//code，0：正常，其他：错误
@@ -32,7 +30,6 @@ https://github.com/xiangyuecn/Recorder
                         //wxdown时:v={mime:"audio/amr", data:"base64文本"} 就是返回素材下载的音频文件base64编码数据
                }*/
    /******END******/
-
    //Install Begin：在RecordApp准备好时执行这些代码
    window.OnRecordAppInstalled = window.IOS_Weixin_RecordApp_Config = function () {
       console.log("ios-weixin-config install");
@@ -42,8 +39,6 @@ https://github.com/xiangyuecn/Recorder
       var platform = App.Platforms.Weixin;
       var config = platform.Config;
       var win = window.top;//微信JsSDK让顶层去加载，免得iframe各种麻烦
-
-
       /*********实现app.js内IOS-Weixin中Config的接口*************/
       config.Enable = function (call) {
          //是否启用微信支持，默认启用，如果要禁用就回调call(false)
@@ -55,19 +50,16 @@ https://github.com/xiangyuecn/Recorder
          if (!win.WxReady) {
             win.eval("var InitJsSDK=" + InitJsSDK.toString() + ";InitJsSDK")(App, MyWxApi, ajax);
          };
-
          win.WxReady(call);
       };
-      config.DownWxMedia = function (param, success, fail) {
+      config.DownWxMedia = function (param, success, fail) { 
          /*下载微信录音素材，服务器端接口文档： https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1444738727
          param:{//接口调用参数
             mediaId："" 录音接口上传得到的微信服务器上的ID，用于下载单个素材（如果录音分了多段，会循环调用DownWxMedia）；如果服务器会进行转码，请忽略这个参数
-            
             transform_mediaIds:"mediaId,mediaId,mediaId" 1个及以上mediaId，半角逗号分隔，用于服务器端进行转码用的，正常情况下这个参数用不到。如果服务器端会进行转码，需要把这些素材全部下载下来，然后按顺序合并为一个音频文件
             transform_type:"mp3" 录音set中的类型，用于转码结果类型，正常情况下这个参数用不到。如果服务器端会进行转码，接口返回的mime必须是：audio/type(如：audio/mp3)。
             transform_bitRate:123 建议的比特率，转码用的，同transform_type
-            transform_sampleRate:123 建议的采样率，转码用的，同transform_type
-            
+            transform_sampleRate:123 建议的采样率，转码用的，同transform_type 
             * 素材下载的amr音质很渣，也许可以通过高清接口获得清晰点的speex音频，那么transform_*参数就有用武之地；直接下载的amr只需用mediaId参数就可以了。
          }
          success： fn(obj) 下载成功返回结果
@@ -79,27 +71,18 @@ https://github.com/xiangyuecn/Recorder
             }
          fail: fn(msg) 下载出错回调
          */
-
          ajax(MyWxApi, {
             action: "wxdown"
             , mediaID: param.mediaId
-            , transform_mediaIds: param.transform_mediaIds
-            , transform_type: param.transform_type
-            , transform_bitRate: param.transform_bitRate
-            , transform_sampleRate: param.transform_sampleRate
          }, function (data) {
-            success(data.v);
+            console.log(data);
+            //   下载回调
+            success(data);
          }, function (msg) {
             fail("下载音频失败：" + msg);
          });
       };
       /*********接口实现END*************/
-
-
-
-
-
-
       //手撸一个ajax
       var ajax = function (url, data, True, False) {
          var xhr = new XMLHttpRequest();
@@ -126,10 +109,6 @@ https://github.com/xiangyuecn/Recorder
          xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
          xhr.send(arr.join("&"));
       };
-
-
-
-
       /*********JsSDK*************/
       var InitJsSDK = function (App, MyWxApi, ajax) {
          var wxOjbK = function (call) {
@@ -208,7 +187,7 @@ https://github.com/xiangyuecn/Recorder
             };
             wxConfigStatus = 1;
 
-            var config = function (data) { 
+            var config = function (data) {
                wx.config({
                   debug: false
                   , appId: data.appid
@@ -222,7 +201,6 @@ https://github.com/xiangyuecn/Recorder
                   ).split(",")
                });
                wx.error(function (res) {
-                  console.error("到这了wx.config", res);
                   end(res.errMsg);
                });
                wx.ready(function () {
@@ -233,8 +211,7 @@ https://github.com/xiangyuecn/Recorder
             ajax(MyWxApi, {
                action: "sign"
                , url: encodeURIComponent(location.href.replace(/#.*/g, ""))
-            }, function (data) {
-               console.log(data);
+            }, function (data) { 
                config(data);
             }, end);
          };
@@ -243,9 +220,7 @@ https://github.com/xiangyuecn/Recorder
 
 
    };
-   //Install End
-
-
+   //Install End 
    //如果已加载RecordApp，手动进行触发
    if (window.RecordApp) {
       OnRecordAppInstalled();
