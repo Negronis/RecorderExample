@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: false }));
 app.use(bodyParser.json({ limit: '10mb' }));//设置post body数据的大小 
-app.all('/api', (req, res, next) => {
+app.use('/api', (req, res, next) => {
    res.header("Access-Control-Allow-Origin", "*")
    res.header("Access-Control-Allow-Headers", "*")
    res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS")
