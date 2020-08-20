@@ -1,3 +1,5 @@
+###### 插件库地址为：https://github.com/xiangyuecn/Recorder/tree/master/app-support-sample
+
 ###### 该项目需要注意：
 
 2. 要修改ios-weixin-config.js中的window.RecordAppBaseFolder为当前文件路径
